@@ -17,7 +17,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: demo-app/
-      Handler: app.lambdaHandler
+      Handler: app.helloWorldHandler
       Runtime: nodejs22.x
       Architectures:
         - x86_64
@@ -44,7 +44,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: demo-app/
-      Handler: app.lambdaHandler
+      Handler: app.helloWorldHandler
       Runtime: nodejs18.x
       Policies:
         - Statement:
@@ -125,7 +125,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: demo-app/
-      Handler: app.lambdaHandler
+      Handler: app.helloWorldHandler
       Runtime: nodejs18.x
       Events:
         NoLogEvent:
