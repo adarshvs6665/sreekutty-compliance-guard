@@ -20,4 +20,16 @@ REMOVE COMMENTS BEFORE SENDING IT TO PROFESSOR. COMMENTS ARE FOR US TO UNDERSTAN
 
 
 
+WEEK 3
+-------
 
+pip install checkov
+
+checkov -f template.yml
+
+you can write about the package checkov. and how it detects misconfigurations in IaC.
+
+"Checkov is a static code analysis tool for scanning infrastructure as code (IaC) files for misconfigurations that may lead to security or compliance problems."
+
+This is the output from checkov : output_checkov.txt
+Copy some error cases.
