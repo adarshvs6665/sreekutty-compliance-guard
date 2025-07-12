@@ -33,3 +33,9 @@ you can write about the package checkov. and how it detects misconfigurations in
 
 This is the output from checkov : output_checkov.txt
 Copy some error cases.
+
+
+WEEK 4
+-------
+
+Added Jenkinsfile. It contains code for running the pipeline.
