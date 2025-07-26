@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        nodejs 'NodeJS 24.x'
+        nodejs 'nodejs24'
     }
     environment {
         SAM_TEMPLATE = 'template.yaml'
