@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:22'
-        }
-    }
+    agent any
     environment {
         SAM_TEMPLATE = "template.yaml"
     }
