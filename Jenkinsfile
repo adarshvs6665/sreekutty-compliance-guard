@@ -1,7 +1,10 @@
 pipeline {
     agent any
+    tools {
+        nodejs 'NodeJS 24.x'
+    }
     environment {
-        SAM_TEMPLATE = "template.yaml"
+        SAM_TEMPLATE = 'template.yaml'
     }
     stages {
         stage('Pull main') {
@@ -31,10 +34,10 @@ pipeline {
     }
     post {
         failure {
-            echo "Pipeline failed due to a policy violation."
+            echo 'Pipeline failed due to a policy violation.'
         }
         success {
-            echo "Deployment succeeded!"
+            echo 'Deployment succeeded!'
         }
     }
 }
