@@ -19,7 +19,7 @@ pipeline {
                 }
                 sh '''
                     if ! command -v checkov &> /dev/null; then
-                        sudo pip install checkov
+                        pip install checkov
                     fi
                 '''
             }
