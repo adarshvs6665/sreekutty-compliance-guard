@@ -4,7 +4,7 @@ pipeline {
         nodejs 'nodejs24'
     }
     environment {
-        SAM_TEMPLATE = 'template.yaml'
+        SAM_TEMPLATE = 'template.yml'
     }
     stages {
         stage('Pull main') {
@@ -19,8 +19,7 @@ pipeline {
                 }
                 sh '''
                     if ! command -v checkov &> /dev/null; then
-                        pip install --user checkov
-                        export PATH=$PATH:$HOME/.local/bin
+                        sudo pip install checkov
                     fi
                 '''
             }
@@ -46,10 +45,7 @@ pipeline {
                     steps {
                         script {
                             try {
-                                sh '''
-                                    export PATH=$PATH:$HOME/.local/bin
-                                    checkov -f template.yml
-                                '''
+                                sh 'checkov -f template.yml'
                             } catch (err) {
                                 currentBuild.result = 'FAILURE'
                                 echo 'Checkov failed'
