@@ -4,7 +4,7 @@ pipeline {
         nodejs 'nodejs24'
     }
     environment {
-        SAM_TEMPLATE = 'template.yml'
+        SAM_TEMPLATE = 'template.yaml'
         PATH = "${env.PATH}:${env.HOME}/.local/bin"
     }
     stages {
@@ -49,8 +49,8 @@ pipeline {
                                 sh '''
                                     pwd
                                     ls -la
-                                    ls -la template.yml
-                                    checkov -f ./template.yml
+                                    ls -la template.yaml
+                                    checkov -f ./template.yaml
                                 '''
                             } catch (err) {
                                 currentBuild.result = 'FAILURE'
