@@ -48,7 +48,7 @@ pipeline {
                             try {
                                 sh '''
                                     export PATH=$PATH:$HOME/.local/bin
-                                    checkov -f template.yml --quiet --soft-fail false
+                                    checkov -f template.yml
                                 '''
                             } catch (err) {
                                 currentBuild.result = 'FAILURE'
