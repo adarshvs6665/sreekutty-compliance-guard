@@ -46,7 +46,12 @@ pipeline {
                     steps {
                         script {
                             try {
-                                sh 'checkov -f template.yml'
+                                sh '''
+                                    pwd
+                                    ls -la
+                                    ls -la template.yml
+                                    checkov -f ./template.yml
+                                '''
                             } catch (err) {
                                 currentBuild.result = 'FAILURE'
                                 echo 'Checkov failed'
