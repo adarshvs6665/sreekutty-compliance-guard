@@ -5,6 +5,7 @@ pipeline {
     }
     environment {
         SAM_TEMPLATE = 'template.yml'
+        PATH = "${env.PATH}:${env.HOME}/.local/bin"
     }
     stages {
         stage('Pull main') {
@@ -19,7 +20,7 @@ pipeline {
                 }
                 sh '''
                     if ! command -v checkov &> /dev/null; then
-                        pip install checkov
+                        pip3 install --user checkov
                     fi
                 '''
             }
