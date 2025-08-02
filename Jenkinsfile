@@ -6,6 +6,7 @@ pipeline {
     environment {
         SAM_TEMPLATE = 'template.yaml'
         PATH = "${env.PATH}:${env.HOME}/.local/bin"
+        BUCKET_NAME = "test-bucket-name"
     }
     stages {
         stage('Pull main') {
@@ -47,9 +48,6 @@ pipeline {
                         script {
                             try {
                                 sh '''
-                                    pwd
-                                    ls -la
-                                    ls -la template.yaml
                                     checkov -f ./template.yaml
                                 '''
                             } catch (err) {
@@ -71,7 +69,7 @@ pipeline {
     }
     post {
         failure {
-            echo 'Pipeline failed due to a policy violation.'
+            echo 'Pipeline failed due to a compliance violation.'
         }
         success {
             echo 'Deployment succeeded!'
