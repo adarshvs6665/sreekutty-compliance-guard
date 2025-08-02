@@ -6,6 +6,7 @@ const s3 = new S3Client({});
 export const secureHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     try {
         const timestamp = new Date().toISOString();
+        console.log('test2')
         const result = await s3.send(
             new PutObjectCommand({
                 Bucket: getEnv('BUCKET_NAME'),
