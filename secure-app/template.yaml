@@ -24,6 +24,11 @@ Resources:
           Properties:
             Path: /secure
             Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        External:
+          - aws-sdk
 
   SecureBucket:
     Type: AWS::S3::Bucket
