@@ -28,7 +28,7 @@ Resources:
   SecureBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: secure-bucket
+      BucketName: secure-bucket-3f00289d115df58802100220d0ffc351
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:

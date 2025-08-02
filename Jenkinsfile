@@ -8,7 +8,7 @@ pipeline {
     }
     environment {
         PATH = "${env.PATH}:${env.HOME}/.local/bin"
-        BUCKET_NAME = "secure-bucket"
+        BUCKET_NAME = "secure-bucket-3f00289d115df58802100220d0ffc351"
     }
     stages {
         stage('Pull main') {
