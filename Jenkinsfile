@@ -75,7 +75,34 @@ pipeline {
                 withAWS(credentials: 'aws-creds', region: 'eu-west-1') {
                     script {
                         dir("${params.APP_NAME}") {
-                            sh 'sam build'
+                            // Clean any previous builds
+                            sh 'rm -rf .aws-sam'
+                            
+                            // Install only production dependencies
+                            sh 'npm ci --only=production'
+                            
+                            // Build with specific optimizations
+                            sh '''
+                                sam build \\
+                                    --use-container \\
+                                    --debug \\
+                                    --skip-pull-image
+                            '''
+                            
+                            // Check the size of the built package
+                            sh '''
+                                echo "=== Build Directory Contents ==="
+                                find .aws-sam/build -type f -exec ls -lh {} + | head -20
+                                echo "=== Total Build Size ==="
+                                du -sh .aws-sam/build
+                                echo "=== Lambda Function Size ==="
+                                if [ -d ".aws-sam/build/SecureLambda" ]; then
+                                    du -sh .aws-sam/build/SecureLambda
+                                    echo "=== Large files in Lambda function ==="
+                                    find .aws-sam/build/SecureLambda -size +10M -exec ls -lh {} +
+                                fi
+                            '''
+                            
                             sh "sam deploy --template-file template.yaml --no-confirm-changeset --capabilities CAPABILITY_IAM --region eu-west-1"
                         }
                     }
