@@ -76,7 +76,7 @@ pipeline {
                     script {
                         dir("${params.APP_NAME}") {
                             sh 'sam build'
-                            sh "sam deploy --template-file template.yaml --no-confirm-changeset --capabilities CAPABILITY_IAM --region eu-west-1 --s3-bucket ${BUCKET_NAME}"
+                            sh "sam deploy --template-file template.yaml --no-confirm-changeset --capabilities CAPABILITY_IAM --region eu-west-1"
                         }
                     }
                 }
