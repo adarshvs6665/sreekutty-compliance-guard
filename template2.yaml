@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: sam-app - Compliance Followed Demo
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs18.x
+    MemorySize: 128
+
+Resources:
+  SecureLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: .
+      ReservedConcurrentExecutions: 5
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref SecureBucket
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /secure
+            Method: get
+
+  SecureBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: secure-bucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true

@@ -1,12 +1,14 @@
 pipeline {
     agent any
+    parameters {
+        choice(name: 'APP_NAME', choices: ['vulnerable-app', 'secure-app'], description: 'Select app to deploy')
+    }
     tools {
         nodejs 'nodejs24'
     }
     environment {
-        SAM_TEMPLATE = 'template.yaml'
         PATH = "${env.PATH}:${env.HOME}/.local/bin"
-        BUCKET_NAME = "test-bucket-name"
+        BUCKET_NAME = "secure-bucket"
     }
     stages {
         stage('Pull main') {
@@ -16,7 +18,7 @@ pipeline {
         }
         stage('Install dependencies') {
             steps {
-                dir('vulnerable-app') {
+                dir("${params.APP_NAME}") {
                     sh 'npm ci'
                 }
                 sh '''
@@ -30,7 +32,7 @@ pipeline {
             parallel {
                 stage('Run lint') {
                     steps {
-                        dir('vulnerable-app') {
+                        dir("${params.APP_NAME}") {
                             script {
                                 try {
                                     sh 'npm run lint'
@@ -46,10 +48,12 @@ pipeline {
                 stage('Run checkov') {
                     steps {
                         script {
+                            def template = params.APP_NAME == 'secure-app' ? 'template2.yaml' : 'template.yaml'
+                            def command = params.APP_NAME == 'secure-app' ? 
+                                "checkov -f ${template} --config-file .checkov.yaml" : 
+                                "checkov -f ./${template}"
                             try {
-                                sh '''
-                                    checkov -f ./template.yaml
-                                '''
+                                sh command
                             } catch (err) {
                                 currentBuild.result = 'FAILURE'
                                 echo 'Checkov failed'
@@ -62,8 +66,11 @@ pipeline {
         }
         stage('SAM deploy') {
             steps {
-                sh 'sam build'
-                sh 'sam deploy --no-confirm-changeset --capabilities CAPABILITY_IAM'
+                script {
+                    def template = params.APP_NAME == 'secure-app' ? 'template2.yaml' : 'template.yaml'
+                    sh 'sam build'
+                    sh "sam deploy --template-file ${template} --no-confirm-changeset --capabilities CAPABILITY_IAM"
+                }
             }
         }
     }
