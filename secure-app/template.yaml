@@ -25,7 +25,6 @@ Resources:
             Path: /secure
             Method: get
     Metadata:
-      BuildMethod: esbuild
       BuildProperties:
         External:
           - aws-sdk
