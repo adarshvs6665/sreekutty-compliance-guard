@@ -12,9 +12,8 @@ Resources:
   SecureLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.handler
       CodeUri: .
-      ReservedConcurrentExecutions: 5
+      Handler: app.secureHandler
       Environment:
         Variables:
           BUCKET_NAME: !Ref SecureBucket
@@ -25,9 +24,16 @@ Resources:
             Path: /secure
             Method: get
     Metadata:
+      BuildMethod: esbuild
       BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: false
+        TreeShaking: true
         External:
           - aws-sdk
+        Bundle: true
+        Format: cjs
 
   SecureBucket:
     Type: AWS::S3::Bucket
