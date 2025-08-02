@@ -15,7 +15,7 @@ pipeline {
         }
         stage('Install dependencies') {
             steps {
-                dir('demo-app') {
+                dir('vulnerable-app') {
                     sh 'npm ci'
                 }
                 sh '''
@@ -29,7 +29,7 @@ pipeline {
             parallel {
                 stage('Run lint') {
                     steps {
-                        dir('demo-app') {
+                        dir('vulnerable-app') {
                             script {
                                 try {
                                     sh 'npm run lint'

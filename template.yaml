@@ -16,7 +16,7 @@ Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: demo-app/
+      CodeUri: vulnerable-app/
       Handler: app.helloWorldHandler
       Runtime: nodejs22.x
       Architectures:
@@ -37,13 +37,44 @@ Resources:
           - app.ts
 
   #############################################
+  ## Code Level Violation Handler Function
+  #############################################
+  CodeLevelViolationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: vulnerable-app/
+      Handler: app.codeLevelViolationHandler
+      Runtime: nodejs22.x
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          SSN: "123-45-6789"  # PII in env var → ❌
+          EMAIL: "patient@example.com"  # More PII → ❌
+          DB_PASSWORD: "admin123"  # Hardcoded secret → ❌
+      Events:
+        CodeViolationApi:
+          Type: Api
+          Properties:
+            Path: /code-violations
+            Method: post
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
+  #############################################
   ## 1. Lambda with Full IAM Access (❌)
   ## Violates: Principle of Least Privilege (HIPAA, SOC 2)
   #############################################
   BadIAMLambda:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: demo-app/
+      CodeUri: vulnerable-app/
       Handler: app.helloWorldHandler
       Runtime: nodejs18.x
       Policies:
@@ -124,7 +155,7 @@ Resources:
   LambdaWithoutAuditLogging:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: demo-app/
+      CodeUri: vulnerable-app/
       Handler: app.helloWorldHandler
       Runtime: nodejs18.x
       Events:
@@ -142,7 +173,7 @@ Resources:
   VulnerableLambda:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: demo-app/
+      CodeUri: vulnerable-app/
       Handler: vulnerable.handler
       Runtime: nodejs18.x
       Environment:
@@ -264,9 +295,15 @@ Outputs:
   HelloWorldFunctionIamRole:
     Description: Implicit IAM Role created for Hello World function
     Value: !GetAtt HelloWorldFunctionRole.Arn
+  CodeLevelViolationFunction:
+    Description: Code Level Violation Lambda Function ARN
+    Value: !GetAtt CodeLevelViolationFunction.Arn
   PublicS3BucketName:
     Description: Public S3 bucket for testing
     Value: !Ref PublicS3Bucket
   VulnerableEndpoints:
     Description: API endpoints for vulnerability testing
     Value: !Sub "https://${ApiWithoutLogging}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+  CodeViolationEndpoint:
+    Description: Code violation endpoint for testing
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/code-violations/"
