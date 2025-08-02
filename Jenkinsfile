@@ -71,10 +71,12 @@ pipeline {
         }
         stage('SAM deploy') {
             steps {
-                script {
-                    def template = params.APP_NAME == 'secure-app' ? 'template2.yaml' : 'template.yaml'
-                    sh 'sam build'
-                    sh "sam deploy --template-file ${template} --no-confirm-changeset --capabilities CAPABILITY_IAM"
+                withAWS(credentials: 'aws-creds', region: 'eu-west-1') {
+                    script {
+                        def template = params.APP_NAME == 'secure-app' ? 'template2.yaml' : 'template.yaml'
+                        sh 'sam build'
+                        sh "sam deploy --template-file ${template} --no-confirm-changeset --capabilities CAPABILITY_IAM --region eu-west-1"
+                    }
                 }
             }
         }
