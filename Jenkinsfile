@@ -25,6 +25,11 @@ pipeline {
                     if ! command -v checkov &> /dev/null; then
                         pip3 install --user checkov
                     fi
+
+                    if ! command -v sam &> /dev/null; then
+                        pip3 install aws-sam-cli
+                    fi
+                    sam --version
                 '''
             }
         }
