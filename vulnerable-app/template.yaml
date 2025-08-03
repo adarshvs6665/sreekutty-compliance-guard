@@ -10,9 +10,6 @@ Globals:
       LogFormat: JSON
 
 Resources:
-  #############################################
-  ## Existing Function from Boilerplate
-  #############################################
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -36,9 +33,7 @@ Resources:
         EntryPoints:
           - app.ts
 
-  #############################################
-  ## Code Level Violation Handler Function
-  #############################################
+  # Code level violation handler function
   CodeLevelViolationFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -49,9 +44,9 @@ Resources:
         - x86_64
       Environment:
         Variables:
-          SSN: "123-45-6789"  # PII in env var → ❌
-          EMAIL: "patient@example.com"  # More PII → ❌
-          DB_PASSWORD: "admin123"  # Hardcoded secret → ❌
+          SSN: "123-45-6789"  # PII in env var
+          EMAIL: "patient@example.com"  # More PII
+          DB_PASSWORD: "admin123"  # Hardcoded secret
       Events:
         CodeViolationApi:
           Type: Api
@@ -67,10 +62,8 @@ Resources:
         EntryPoints:
           - app.ts
 
-  #############################################
-  ## 1. Lambda with Full IAM Access (❌)
-  ## Violates: Principle of Least Privilege (HIPAA, SOC 2)
-  #############################################
+  # 1. Lambda with Full IAM Access
+  # Violates: Principle of least privilege (HIPAA, SOC 2)
   BadIAMLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -84,9 +77,9 @@ Resources:
               Resource: "*"
       Environment:
         Variables:
-          SSN: "123-45-6789"  # PII in env var → ❌
-          EMAIL: "patient@example.com"  # More PII → ❌
-          PASSWORD: "hardcoded123"  # Hardcoded secret → ❌
+          SSN: "123-45-6789"  # PII in env var
+          EMAIL: "patient@example.com"  # More PII
+          PASSWORD: "hardcoded123"  # Hardcoded secret
       Events:
         HelloBadIAM:
           Type: Api
@@ -94,10 +87,8 @@ Resources:
             Path: /bad-iam
             Method: get
 
-  #############################################
-  ## 2. Public S3 Bucket (❌) - FIXED VERSION
-  ## Violates: Data privacy (HIPAA, GDPR)
-  #############################################
+  # 2. Public S3 bucket
+  # Violates: data privacy (HIPAA, GDPR)
   PublicS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -108,7 +99,7 @@ Resources:
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
 
-  # Bucket policy to make it truly public (❌)
+  # Bucket policy to make it truly public
   PublicS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -120,37 +111,31 @@ Resources:
             Action: "s3:GetObject"
             Resource: !Sub "${PublicS3Bucket}/*"
 
-  #############################################
-  ## 3. Unencrypted S3 Bucket (❌)
-  ## Violates: Encryption at rest (HIPAA, PCI-DSS)
-  #############################################
+  # 3. Unencrypted S3 bucket
+  # Violates: Encryption at rest (HIPAA, PCI-DSS)
   UnencryptedS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "unencrypted-demo-bucket-${AWS::AccountId}-${AWS::Region}"
-      # Explicitly no BucketEncryption block → ❌
+      # Explicitly no bucketEncryption block
 
-  #############################################
-  ## 4. S3 Without Versioning (❌)
-  ## Violates: No data backup (HIPAA, SOC 2 Availability)
-  #############################################
+  # 4. S3 without versioning
+  # Violates: No data backup (HIPAA, SOC 2 Availability)
   UnversionedS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "unversioned-demo-bucket-${AWS::AccountId}-${AWS::Region}"
       VersioningConfiguration:
-        Status: Suspended  # ❌ Versioning disabled
+        Status: Suspended  # Versioning disabled
 
-  #############################################
-  ## 5. API Without Access Logs (❌)
-  ## Violates: HIPAA Audit Controls §164.312(b), SOC 2
-  #############################################
+  # 5. API Without access logs
+  # Violates: HIPAA audit controls §164.312(b), SOC 2
   ApiWithoutLogging:
     Type: AWS::Serverless::Api
     Properties:
       Name: NoLoggingAPI
       StageName: prod
-      # AccessLogSetting omitted → no logging ❌
+      # AccessLogSetting omitted (no logging)
 
   LambdaWithoutAuditLogging:
     Type: AWS::Serverless::Function
@@ -166,10 +151,8 @@ Resources:
             Method: get
             RestApiId: !Ref ApiWithoutLogging
 
-  #############################################
-  ## 6. Lambda with Input Validation Issues (❌)
-  ## Violates: OWASP Top 10, PCI-DSS 6.5.1, HIPAA
-  #############################################
+  # 6. Lambda with input validation issues
+  # Violates: OWASP Top 10, PCI-DSS 6.5.1, HIPAA
   VulnerableLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -178,7 +161,7 @@ Resources:
       Runtime: nodejs18.x
       Environment:
         Variables:
-          DB_PASSWORD: "admin123"  # Another hardcoded secret ❌
+          DB_PASSWORD: "admin123"  # hardcoded secret 
       Events:
         VulnerableApi:
           Type: Api
@@ -186,10 +169,8 @@ Resources:
             Path: /vulnerable
             Method: post
 
-  #############################################
-  ## 7. Overly Permissive Security Group (❌)
-  ## Violates: HIPAA, GDPR, PCI-DSS
-  #############################################
+  # 7. Overly permissive security group
+  # Violates: HIPAA, GDPR, PCI-DSS
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -213,18 +194,16 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 0.0.0.0/0  # ❌ SSH open to the world
+          CidrIp: 0.0.0.0/0  # SSH open to anyone on internet
         - IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
-          CidrIp: 0.0.0.0/0  # ❌ Database port open to the world
+          CidrIp: 0.0.0.0/0  # Database port open to anyone on internet
         - IpProtocol: -1
-          CidrIp: 0.0.0.0/0  # ❌ All traffic allowed
+          CidrIp: 0.0.0.0/0  # All traffic allowed
 
-  #############################################
-  ## 8. RDS Without Encryption (❌)
-  ## Violates: HIPAA, PCI-DSS encryption requirements
-  #############################################
+  # 8. RDS Without Encryption
+  # Violates: HIPAA, PCI-DSS encryption requirements
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -247,29 +226,24 @@ Resources:
       DBInstanceClass: db.t3.micro
       Engine: mysql
       MasterUsername: admin
-      MasterUserPassword: "hardcoded-password-123"  # ❌ Hardcoded password
+      MasterUserPassword: "hardcoded-password-123"  # Hardcoded password
       AllocatedStorage: 20
-      StorageEncrypted: false  # ❌ No encryption
-      PubliclyAccessible: true  # ❌ Publicly accessible
+      StorageEncrypted: false  # No encryption
+      PubliclyAccessible: true  # Publicly accessible
       VPCSecurityGroups:
         - !Ref OverlyPermissiveSecurityGroup
       DBSubnetGroupName: !Ref DBSubnetGroup
-      BackupRetentionPeriod: 0  # ❌ No backups
+      BackupRetentionPeriod: 0  # No backups
 
-  #############################################
-  ## 9. CloudWatch Logs Without Encryption (❌)
-  ## Violates: HIPAA, PCI-DSS
-  #############################################
+  # 9. CloudWatch logs without encryption
+  # Violates: HIPAA, PCI-DSS
   UnencryptedLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: /aws/lambda/unencrypted-logs
-      RetentionInDays: 1  # ❌ Very short retention
-      # KmsKeyId omitted → no encryption ❌
+      RetentionInDays: 1  # Very short retention
+      # KmsKeyId omitted (no encryption)
 
-  #############################################
-  ## Application Insights (unchanged)
-  #############################################
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
