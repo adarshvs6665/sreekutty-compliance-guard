@@ -34,6 +34,8 @@ Resources:
           - aws-sdk
         Bundle: true
         Format: cjs
+        EntryPoints:
+          - app.ts
 
   SecureBucket:
     Type: AWS::S3::Bucket
