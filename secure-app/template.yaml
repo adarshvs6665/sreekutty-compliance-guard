@@ -17,6 +17,14 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref SecureBucket
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+                - s3:PutObjectAcl
+              Resource: "*"
       Events:
         ApiEvent:
           Type: Api
